@@ -1,9 +1,12 @@
 const express = require("express")
 const app = express()
+const cors = require("cors")
 
 require("dotenv").config()
-const port = process.env.PORT
+require("./models")
 
+const port = process.env.PORT
+app.use(cors(""))
 app.listen(port, () => {
     console.log("Server started on port: " + port)
 })
