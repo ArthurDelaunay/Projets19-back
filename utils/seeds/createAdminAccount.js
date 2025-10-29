@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt")
 const { User } = require("../../models")
-require("dotenv").config()
+require("dotenv").config({ quiet: true })
 
 const runSeeding = async () => {
     const hashedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD, 10)

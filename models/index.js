@@ -1,5 +1,5 @@
 const { Sequelize } = require("sequelize")
-require("dotenv").config()
+require("dotenv").config({ quiet: true })
 
 const sequelize = new Sequelize(
     process.env.DATABASE,
@@ -16,8 +16,8 @@ const connectDb = async () => {
     try {
         await sequelize.authenticate()
         console.log("Connection has been established")
-    } catch (error) {
-        console.error("Unable to connect to the database" + error)
+    } catch (e) {
+        console.error("Unable to connect to the database" + e)
     }
 }
 
