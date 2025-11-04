@@ -9,6 +9,7 @@ const {
     websiteLinkLabelNotExist,
     websiteLinkExist,
 } = require("../middlewares/websitesLinks")
+const { isAdmin } = require("../middlewares/admin")
 const { WebsiteLink } = require("../models/index")
 
 // route pour obtenir la site les liens des sites utiles pour l'association
@@ -16,7 +17,7 @@ const { WebsiteLink } = require("../models/index")
 app.get("/", passport.authenticate("jwt"), async (req, res) => {
     try {
         const links = await WebsiteLink.findAll({
-            attributes: ["label", "url"],
+            attributes: ["label", "url", "id"],
         })
         if (links) {
             res.status(200).json(links)
@@ -169,6 +170,7 @@ app.put(
 app.delete(
     "/:websiteLinkId",
     passport.authenticate("jwt"),
+    isAdmin,
     websiteLinkExist,
     async (req, res) => {
         try {

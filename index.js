@@ -21,8 +21,8 @@ app.use(
 )
 
 // création d'un compte admin au lancement du serveur
-// const runSeeding = require("./utils/seeds/createAdminAccount")
-// runSeeding()
+const createAccounts = require("./utils/seeds/createAccounts")
+createAccounts()
 app.use("/auth", authRoutes)
 app.use("/websitesLinks", websitesLinksRoutes)
 
