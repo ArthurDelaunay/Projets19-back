@@ -12,7 +12,7 @@ const {
 const { isAdmin } = require("../middlewares/admin")
 const { WebsiteLink } = require("../models/index")
 
-// route pour obtenir la site les liens des sites utiles pour l'association
+// route pour obtenir la liste des liens des sites utiles pour l'association
 // route protégé par l'authentification
 app.get("/", passport.authenticate("jwt"), async (req, res) => {
     try {
@@ -166,7 +166,7 @@ app.put(
 )
 
 // route pour supprimer un lien des sites utiles pour l'association
-// route protégé par l'authentification
+// route protégé par l'authentification administrateur
 app.delete(
     "/:websiteLinkId",
     passport.authenticate("jwt"),

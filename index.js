@@ -2,8 +2,10 @@ const express = require("express")
 const app = express()
 const cors = require("cors")
 const session = require("express-session")
+
 const authRoutes = require("./routes/auth")
 const websitesLinksRoutes = require("./routes/websitesLinks")
+const quizRoutes = require("./routes/quiz")
 require("dotenv").config({ quiet: true })
 require("./models")
 const port = process.env.PORT
@@ -25,6 +27,7 @@ const createAccounts = require("./utils/seeds/createAccounts")
 createAccounts()
 app.use("/auth", authRoutes)
 app.use("/websitesLinks", websitesLinksRoutes)
+app.use("/quiz", quizRoutes)
 
 app.listen(port, () => {
     console.log("Server started on port: " + port)
