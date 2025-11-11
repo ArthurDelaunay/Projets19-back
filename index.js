@@ -6,6 +6,8 @@ const session = require("express-session")
 const authRoutes = require("./routes/auth")
 const websitesLinksRoutes = require("./routes/websitesLinks")
 const quizRoutes = require("./routes/quiz")
+const questionsRoutes = require("./routes/questions")
+
 require("dotenv").config({ quiet: true })
 require("./models")
 const port = process.env.PORT
@@ -28,6 +30,7 @@ createAccounts()
 app.use("/auth", authRoutes)
 app.use("/websitesLinks", websitesLinksRoutes)
 app.use("/quiz", quizRoutes)
+app.use("/questions", questionsRoutes)
 
 app.listen(port, () => {
     console.log("Server started on port: " + port)

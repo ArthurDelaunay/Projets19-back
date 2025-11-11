@@ -30,7 +30,7 @@ const User = require("./user")(sequelize)
 const WebsiteLink = require("./websiteLink")(sequelize)
 
 Answer.belongsTo(Question)
-Question.hasMany(Answer)
+Question.hasMany(Answer, { onDelete: "CASCADE" })
 
 Question.belongsTo(User)
 User.hasMany(Question)
