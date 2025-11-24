@@ -29,8 +29,8 @@ const Question = require("./question")(sequelize)
 const User = require("./user")(sequelize)
 const WebsiteLink = require("./websiteLink")(sequelize)
 
-Answer.belongsTo(Question)
-Question.hasMany(Answer, { onDelete: "CASCADE" })
+Answer.belongsTo(Question, { onDelete: "CASCADE", onUpdate: "CASCADE" })
+Question.hasMany(Answer)
 
 Question.belongsTo(User)
 User.hasMany(Question)

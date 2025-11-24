@@ -13,7 +13,7 @@ const { isAdmin } = require("../middlewares/admin")
 const { WebsiteLink } = require("../models/index")
 
 // route pour obtenir la liste des liens des sites utiles pour l'association
-// route protégé par l'authentification
+// route protégée par l'authentification
 app.get("/", passport.authenticate("jwt"), async (req, res) => {
     try {
         const links = await WebsiteLink.findAll({
@@ -32,7 +32,7 @@ app.get("/", passport.authenticate("jwt"), async (req, res) => {
 })
 
 // route pour créer un lien des sites utiles pour l'association
-// route protégé par l'authentification
+// route protégée par l'authentification
 app.post(
     "/",
     passport.authenticate("jwt"),
@@ -72,7 +72,7 @@ app.post(
 )
 
 // route pour mettre à jour un lien des sites utiles pour l'association
-// route protégé par l'authentification
+// route protégée par l'authentification
 app.put(
     "/:websiteLinkId",
     passport.authenticate("jwt"),
@@ -166,7 +166,7 @@ app.put(
 )
 
 // route pour supprimer un lien des sites utiles pour l'association
-// route protégé par l'authentification administrateur
+// route protégée par l'authentification administrateur
 app.delete(
     "/:websiteLinkId",
     passport.authenticate("jwt"),

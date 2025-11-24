@@ -10,6 +10,10 @@ module.exports = (sequelize) => {
             type: DataTypes.BOOLEAN,
             allowNull: false,
         },
+        lastUpdateBy: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
     })
     return Answer
 }

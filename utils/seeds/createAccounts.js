@@ -26,12 +26,12 @@ const createTestUserAccount = async () => {
 }
 
 const createAccounts = async () => {
-    const existingAdmin = await User.findAll({ where: { role: "admin" } })
-    const existingTestUser = await User.findAll({ where: { role: "testuser" } })
-    if (existingAdmin.length == 0) {
+    const existingAdmin = await User.findOne({ where: { role: "admin" } })
+    const existingTestUser = await User.findOne({ where: { role: "testuser" } })
+    if (!existingAdmin) {
         await createAdminAccount()
     }
-    if (existingTestUser.length == 0) {
+    if (!existingTestUser) {
         await createTestUserAccount()
     }
 }
