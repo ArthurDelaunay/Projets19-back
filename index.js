@@ -7,6 +7,7 @@ const authRoutes = require("./routes/auth")
 const websitesLinksRoutes = require("./routes/websitesLinks")
 const quizRoutes = require("./routes/quiz")
 const questionsRoutes = require("./routes/questions")
+const usersRoutes = require("./routes/users")
 
 require("dotenv").config({ quiet: true })
 require("./models")
@@ -24,13 +25,15 @@ app.use(
     })
 )
 
-// création d'un compte admin au lancement du serveur
+// création de comptes admin et utilisateur test au lancement du serveur
 const createAccounts = require("./utils/seeds/createAccounts")
 createAccounts()
+
 app.use("/auth", authRoutes)
 app.use("/websitesLinks", websitesLinksRoutes)
 app.use("/quiz", quizRoutes)
 app.use("/questions", questionsRoutes)
+app.use("/users", usersRoutes)
 
 app.listen(port, () => {
     console.log("Server started on port: " + port)

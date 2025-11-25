@@ -10,6 +10,9 @@ const createAdminAccount = async () => {
         username: "admin",
         password: hashedPassword,
         role: "admin",
+        isActive: true,
+        firstName: "admin",
+        lastName: "admin",
     })
     console.log("done")
 }
@@ -21,6 +24,9 @@ const createTestUserAccount = async () => {
         username: "testUser",
         password: hashedPassword,
         role: "testuser",
+        isActive: true,
+        firstName: "test",
+        lastName: "user",
     })
     console.log("done")
 }
