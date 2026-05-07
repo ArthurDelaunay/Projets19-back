@@ -8,6 +8,8 @@ const websitesLinksRoutes = require("./routes/websitesLinks")
 const quizRoutes = require("./routes/quiz")
 const questionsRoutes = require("./routes/questions")
 const usersRoutes = require("./routes/users")
+const userRoutes = require("./routes/user")
+const categoriesRoutes = require("./routes/categories")
 
 require("dotenv").config({ quiet: true })
 require("./models")
@@ -34,6 +36,8 @@ app.use("/websitesLinks", websitesLinksRoutes)
 app.use("/quiz", quizRoutes)
 app.use("/questions", questionsRoutes)
 app.use("/users", usersRoutes)
+app.use("/user", userRoutes)
+app.use("/categories", categoriesRoutes)
 
 app.listen(port, () => {
     console.log("Server started on port: " + port)

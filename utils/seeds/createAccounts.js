@@ -7,6 +7,7 @@ const createAdminAccount = async () => {
 
     console.log("Tentative de création Admin")
     await User.create({
+        email: "admin",
         username: "admin",
         password: hashedPassword,
         role: "admin",
@@ -21,6 +22,7 @@ const createTestUserAccount = async () => {
 
     console.log("Tentative de création de compte utilisateur de test")
     await User.create({
+        email: "testUser",
         username: "testUser",
         password: hashedPassword,
         role: "testuser",

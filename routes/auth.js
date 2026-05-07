@@ -8,7 +8,7 @@ const bcrypt = require("bcrypt")
 
 app.post(
     "/login",
-    body("username").exists().withMessage("username is required"),
+    body("email").exists().withMessage("email is required"),
     body("password").exists().withMessage("password is required"),
     async (req, res) => {
         try {
@@ -16,29 +16,39 @@ app.post(
             if (errorResult.length > 0) {
                 res.status(400).json({ errors: errorResult })
             } else {
-                const { username, password } = req.body
-                // logique pour trouver le user avec son username et password
-                const user = await User.findOne({ where: { username } })
+                const { email, password } = req.body
+                // logique pour trouver le user avec son email et password
+                const user = await User.findOne({ where: { email } })
                 if (!user) {
                     // si le user n'existe pas, on renvoie une erreur 404
                     res.status(404).json({
-                        errors: [{ msg: "username not found" }],
+                        errors: [{ msg: "user not found" }],
                     })
                 } else {
-                    const validPassword = await bcrypt.compare(
-                        password,
-                        user.password
-                    )
-                    if (validPassword) {
-                        // génération du token
-                        const token = issueJTW(user)
-                        // réponse de l'API au client avec le user et le token
-                        res.status(200).json({
-                            token,
-                        })
+                    if (user.isActive) {
+                        const validPassword = await bcrypt.compare(
+                            password,
+                            user.password
+                        )
+                        if (validPassword) {
+                            // génération du token
+                            const token = issueJTW(user)
+                            // réponse de l'API au client avec le user et le token
+                            res.status(200).json({
+                                token,
+                            })
+                        } else {
+                            res.status(400).json({
+                                errors: [{ msg: "incorrect password" }],
+                            })
+                        }
                     } else {
                         res.status(400).json({
-                            errors: [{ msg: "incorrect password" }],
+                            errors: [
+                                {
+                                    msg: "this account is not active, please contact an admin",
+                                },
+                            ],
                         })
                     }
                 }

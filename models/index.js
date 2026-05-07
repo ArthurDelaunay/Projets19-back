@@ -28,6 +28,7 @@ const CV = require("./cv")(sequelize)
 const Question = require("./question")(sequelize)
 const User = require("./user")(sequelize)
 const WebsiteLink = require("./websiteLink")(sequelize)
+const Category = require("./category")(sequelize)
 
 Answer.belongsTo(Question, { onDelete: "CASCADE", onUpdate: "CASCADE" })
 Question.hasMany(Answer)
@@ -41,6 +42,9 @@ User.hasMany(CV)
 WebsiteLink.belongsTo(User)
 User.hasMany(WebsiteLink)
 
+WebsiteLink.belongsTo(Category, { onDelete: "CASCADE", onUpdate: "CASCADE" })
+Category.hasMany(WebsiteLink)
+
 sequelize.sync({ alter: true })
 
 const db = {
@@ -50,6 +54,7 @@ const db = {
     Question,
     User,
     WebsiteLink,
+    Category,
 }
 
 module.exports = db

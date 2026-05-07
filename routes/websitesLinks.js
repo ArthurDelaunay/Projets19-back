@@ -10,14 +10,32 @@ const {
     websiteLinkExist,
 } = require("../middlewares/websitesLinks")
 const { isAdmin } = require("../middlewares/admin")
-const { WebsiteLink } = require("../models/index")
+const { WebsiteLink, Category } = require("../models/index")
+const {
+    categoryIdExistByParams,
+    categoryIdExistByBody,
+} = require("../middlewares/categories")
 
 // route pour obtenir la liste des liens des sites utiles pour l'association
 // route protégée par l'authentification
 app.get("/", passport.authenticate("jwt"), async (req, res) => {
     try {
-        const links = await WebsiteLink.findAll({
-            attributes: ["label", "url", "id"],
+        // const links = await WebsiteLink.findAll({
+        //     attributes: ["label", "url", "id"],
+        // })
+        // if (links) {
+        //     res.status(200).json(links)
+        // } else {
+        //     res.status(404).json({ errors: [{ msg: "no link found" }] })
+        // }
+        const links = await Category.findAll({
+            attributes: ["id", "label"],
+            include: [
+                {
+                    association: "websiteLinks",
+                    attributes: ["id", "label", "url"],
+                },
+            ],
         })
         if (links) {
             res.status(200).json(links)
@@ -25,6 +43,7 @@ app.get("/", passport.authenticate("jwt"), async (req, res) => {
             res.status(404).json({ errors: [{ msg: "no link found" }] })
         }
     } catch (e) {
+        console.log
         res.status(500).json({
             errors: [{ msg: "Internal server problem" }],
         })
@@ -34,8 +53,9 @@ app.get("/", passport.authenticate("jwt"), async (req, res) => {
 // route pour créer un lien des sites utiles pour l'association
 // route protégée par l'authentification
 app.post(
-    "/",
+    "/:categoryId",
     passport.authenticate("jwt"),
+    categoryIdExistByParams,
     websiteLinkUrlNotExist,
     websiteLinkLabelNotExist,
     body("label")
@@ -48,6 +68,7 @@ app.post(
         .withMessage("url is required")
         .notEmpty()
         .withMessage("url can't be empty"),
+
     async (req, res) => {
         try {
             const errorResult = validationResult(req).array()
@@ -55,11 +76,13 @@ app.post(
                 res.status(400).json({ errors: errorResult })
             } else {
                 const { url, label } = req.body
+                const { categoryId } = req.params
                 const { id } = req.user.dataValues
                 const newWebsiteLink = await WebsiteLink.create({
                     url,
                     label,
                     userId: id,
+                    categoryId,
                 })
                 res.status(201).json(newWebsiteLink)
             }
@@ -77,17 +100,22 @@ app.put(
     "/:websiteLinkId",
     passport.authenticate("jwt"),
     websiteLinkExist,
+    categoryIdExistByBody,
     body("url")
         .exists()
         .withMessage("url is required")
         .notEmpty()
         .withMessage("url can't be empty"),
-
     body("label")
         .exists()
         .withMessage("label is required")
         .notEmpty()
         .withMessage("label can't be empty"),
+    body("categoryId")
+        .exists()
+        .withMessage("url is required")
+        .notEmpty()
+        .withMessage("url can't be empty"),
 
     async (req, res) => {
         try {
@@ -96,66 +124,84 @@ app.put(
                 res.status(400).json({ errors: errorResult })
             } else {
                 const { websiteLinkId } = req.params
-                const { url, label } = req.body
+                const { url, label, categoryId } = req.body
                 const { id } = req.user.dataValues
-                const websiteLink = await WebsiteLink.findOne({
-                    where: { id: websiteLinkId },
+                await WebsiteLink.update(
+                    {
+                        url,
+                        label,
+                        lastUpdateBy: id,
+                        categoryId,
+                    },
+                    { where: { id: websiteLinkId } }
+                )
+                const updatedWebsiteLink = await WebsiteLink.findOne({
+                    where: {
+                        id: websiteLinkId,
+                    },
                 })
-                if (websiteLink.dataValues.url == url) {
-                    if (websiteLink.dataValues.label == label) {
-                        res.status(409).json({
-                            errors: [
-                                { msg: "url already taken", value: url },
-                                { msg: "label already taken", value: label },
-                            ],
-                        })
-                    } else {
-                        await WebsiteLink.update(
-                            {
-                                label,
-                                lastUpdateBy: id,
-                            },
-                            { where: { id: websiteLinkId } }
-                        )
-                        const updatedWebsiteLink = await WebsiteLink.findOne({
-                            where: {
-                                id: websiteLinkId,
-                            },
-                        })
-                        res.status(200).json(updatedWebsiteLink)
-                    }
-                } else {
-                    if (websiteLink.dataValues.label == label) {
-                        await WebsiteLink.update(
-                            {
-                                url,
-                                lastUpdateBy: id,
-                            },
-                            { where: { id: websiteLinkId } }
-                        )
-                        const updatedWebsiteLink = await WebsiteLink.findOne({
-                            where: {
-                                id: websiteLinkId,
-                            },
-                        })
-                        res.status(200).json(updatedWebsiteLink)
-                    } else {
-                        await WebsiteLink.update(
-                            {
-                                url,
-                                label,
-                                lastUpdateBy: id,
-                            },
-                            { where: { id: websiteLinkId } }
-                        )
-                        const updatedWebsiteLink = await WebsiteLink.findOne({
-                            where: {
-                                id: websiteLinkId,
-                            },
-                        })
-                        res.status(200).json(updatedWebsiteLink)
-                    }
-                }
+                res.status(200).json(updatedWebsiteLink)
+                // const websiteLink = await WebsiteLink.findOne({
+                //     where: { id: websiteLinkId },
+                // })
+                // if (websiteLink.dataValues.url == url) {
+                //     if (websiteLink.dataValues.label == label) {
+                //         res.status(409).json({
+                //             errors: [
+                //                 { msg: "url already taken", value: url },
+                //                 { msg: "label already taken", value: label },
+                //             ],
+                //         })
+                //     } else {
+                //         await WebsiteLink.update(
+                //             {
+                //                 label,
+                //                 lastUpdateBy: id,
+                //                 categoryId,
+                //             },
+                //             { where: { id: websiteLinkId } }
+                //         )
+                //         const updatedWebsiteLink = await WebsiteLink.findOne({
+                //             where: {
+                //                 id: websiteLinkId,
+                //             },
+                //         })
+                //         res.status(200).json(updatedWebsiteLink)
+                //     }
+                // } else {
+                //     if (websiteLink.dataValues.label == label) {
+                //         await WebsiteLink.update(
+                //             {
+                //                 url,
+                //                 lastUpdateBy: id,
+                //                 categoryId,
+                //             },
+                //             { where: { id: websiteLinkId } }
+                //         )
+                //         const updatedWebsiteLink = await WebsiteLink.findOne({
+                //             where: {
+                //                 id: websiteLinkId,
+                //             },
+                //         })
+                //         res.status(200).json(updatedWebsiteLink)
+                //     } else {
+                //         await WebsiteLink.update(
+                //             {
+                //                 url,
+                //                 label,
+                //                 lastUpdateBy: id,
+                //                 categoryId,
+                //             },
+                //             { where: { id: websiteLinkId } }
+                //         )
+                //         const updatedWebsiteLink = await WebsiteLink.findOne({
+                //             where: {
+                //                 id: websiteLinkId,
+                //             },
+                //         })
+                //         res.status(200).json(updatedWebsiteLink)
+                //     }
+                // }
             }
         } catch (e) {
             res.status(500).json({
