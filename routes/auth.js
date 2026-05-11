@@ -34,9 +34,7 @@ app.post(
                             // génération du token
                             const token = issueJTW(user)
                             // réponse de l'API au client avec le user et le token
-                            res.status(200).json({
-                                token,
-                            })
+                            res.status(200).json(token)
                         } else {
                             res.status(400).json({
                                 errors: [{ msg: "incorrect password" }],
