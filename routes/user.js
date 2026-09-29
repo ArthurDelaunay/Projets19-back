@@ -96,8 +96,73 @@ app.get("/", passport.authenticate("jwt"), async (req, res) => {
 
 // route pour modifier ses informations de compte utilisateur
 // route protégée par l'authentification
+app.put(
+    "/",
+    passport.authenticate("jwt"),
+    isEmailTaken,
+    body("email")
+        .exists()
+        .withMessage("email is required")
+        .notEmpty()
+        .withMessage("email can't be empty")
+        .isLength({ max: 128 })
+        .withMessage("email must not exceed 128 characters ")
+        .isEmail()
+        .withMessage("email should follow the email format (xyz@xyz.xyz)"),
+    body("firstName")
+        .exists()
+        .withMessage("first name is required")
+        .notEmpty()
+        .withMessage("first name can't be empty")
+        .isLength({ max: 128 })
+        .withMessage("first name must not exceed 128 characters "),
+    body("lastName")
+        .exists()
+        .withMessage("last name is required")
+        .notEmpty()
+        .withMessage("last name can't be empty")
+        .isLength({ max: 128 })
+        .withMessage("last name must not exceed 128 characters "),
+
+    async (req, res) => {
+        try {
+            const errorResult = validationResult(req).array()
+            if (errorResult.length > 0) {
+                res.status(400).json({ errors: errorResult })
+            } else {
+                const id = req.user.id
+                const { email, firstName, lastName } = req.body
+                await User.update(
+                    { email, firstName, lastName },
+                    { where: { id } }
+                )
+                const updatedUser = await User.findOne({
+                    attributes: { exclude: ["password"] },
+                    where: {
+                        id,
+                    },
+                })
+                res.status(200).json(updatedUser)
+            }
+        } catch (e) {
+            res.status(500).json({
+                errors: [{ msg: "Internal server problem" }],
+            })
+        }
+    }
+)
 
 // route pour désactiver son compte utilisateur
 // route protégée par l'authentification
-
+app.delete("/desactivate", passport.authenticate("jwt"), async (req, res) => {
+    try {
+        const id = req.user.id
+        await User.update({ isActive: 0 }, { where: { id } })
+        res.status(401).json("account desactivated")
+    } catch (e) {
+        res.status(500).json({
+            errors: [{ msg: "Internal server problem" }],
+        })
+    }
+})
 module.exports = app
